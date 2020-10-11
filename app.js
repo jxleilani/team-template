@@ -10,26 +10,27 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-getTeam();
 let team = [];
 let employeeObj = {};
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
+let employee = {};
+getTeam();
+
 async function getTeam() {
     try {
+        //prompt for employee type
         const empType = await promptEmpType();
-        
-            if(empType.employeeType === 'Manager'){
-                employeeObj = await managerPrompt();
-                // team.push(employeeObj);
-            }else if(empType.employeeType === 'Engineer'){
-                employeeObj = await engineerPrompt();
-            }else if(empType.employeeType === 'Intern'){
-                console.log('you chose Intern');
-            }
-         
-            team.push(employeeObj);
-            console.log(employeeObj);
+        if(empType.employeeType === 'Manager'){
+            employeeObj = await managerPrompt();
+            employee = new Manager(employeeObj.name,employeeObj.id,employeeObj.email,employeeObj.office);
+        }else if(empType.employeeType === 'Engineer'){
+            employeeObj = await engineerPrompt();
+            employee = new Engineer(employeeObj.name,employeeObj.id,employeeObj.email,employeeObj.github);
+        }else if(empType.employeeType === 'Intern'){
+            employeeObj = await internPrompt();
+            employee = new Intern(employeeObj.name,employeeObj.id,employeeObj.email,employeeObj.school);
+        }
+        team.push(employee);
+        //then prompt user to create additional employees
         const newEmp = await inquirer.prompt([
                 {
                     type:"list",
@@ -38,12 +39,15 @@ async function getTeam() {
                     choices: ["Yes", "No"]
                 }
         ]);
-    
-            if(newEmp.newEmp === "Yes"){
-                getTeam();
-            }else{
-                console.log(team);
-            }
+        if(newEmp.newEmp === "Yes"){ //if yes, create additional employees
+            getTeam();
+        }else{ //if No, render team.html
+            fs.writeFile("./output/team.html",render(team),function(err){
+                if (err){
+                    throw err;
+                }
+            });
+        }
 
     } catch (err) {
         console.log(err);
@@ -60,7 +64,6 @@ function promptEmpType() {
         }
     ]);
 }
-
 function managerPrompt() {
     return inquirer.prompt([
         {
@@ -106,6 +109,30 @@ function engineerPrompt() {
             type: 'input',
             name: 'github',
             message: 'Enter employee github username:'
+        }
+    ]);
+}
+function internPrompt() {
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'Enter employee name:'
+        },
+        {
+            type: 'input',
+            name: 'id',
+            message: 'Enter employee ID:'
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter employee email:'
+        },
+        {
+            type: 'input',
+            name: 'school',
+            message: 'Enter employee school:'
         }
     ]);
 }
