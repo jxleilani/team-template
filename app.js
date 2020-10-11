@@ -11,7 +11,8 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 getTeam();
-let manRes = '';
+let team = [];
+let employeeObj = {};
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 async function getTeam() {
@@ -19,15 +20,30 @@ async function getTeam() {
         const empType = await promptEmpType();
         
             if(empType.employeeType === 'Manager'){
-             manRes = await managerPrompt();
+                employeeObj = await managerPrompt();
+                // team.push(employeeObj);
             }else if(empType.employeeType === 'Engineer'){
-                console.log('you chose Engineer');
+                employeeObj = await engineerPrompt();
             }else if(empType.employeeType === 'Intern'){
                 console.log('you chose Intern');
             }
          
-
-        console.log(`Role: ${manRes.name}`);
+            team.push(employeeObj);
+            console.log(employeeObj);
+        const newEmp = await inquirer.prompt([
+                {
+                    type:"list",
+                    name: "newEmp",
+                    message: "Do you want to create another employee?",
+                    choices: ["Yes", "No"]
+                }
+        ]);
+    
+            if(newEmp.newEmp === "Yes"){
+                getTeam();
+            }else{
+                console.log(team);
+            }
 
     } catch (err) {
         console.log(err);
@@ -66,6 +82,30 @@ function managerPrompt() {
             type: 'input',
             name: 'office',
             message: 'Enter employee office number:'
+        }
+    ]);
+}
+function engineerPrompt() {
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'Enter employee name:'
+        },
+        {
+            type: 'input',
+            name: 'id',
+            message: 'Enter employee ID:'
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter employee email:'
+        },
+        {
+            type: 'input',
+            name: 'github',
+            message: 'Enter employee github username:'
         }
     ]);
 }
