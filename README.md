@@ -3,6 +3,7 @@ A command line application for generating a software engineering team. The user 
 
 
 ![Team Generator](https://jxleilani.github.io/team-template/Assets/screenshot.png)
+![Command Line](https://jxleilani.github.io/team-template/Assets/screenshot2.png)
 
 ## Instructions
 * From the app.js file run node app.js in your terminal
